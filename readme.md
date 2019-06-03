@@ -1,3 +1,5 @@
+This repository contains the demos and source code for the developed algorithms in the paper "Generalized simultaneous component analysis of binary and quantitative data", \url{https://arxiv.org/abs/1807.04982}. The original version is in \url{http://www.bdagroup.nl/}.
+
 # Demos and Matlab functions for the GSCA models of binary and quantitative data sets
 Author: Yipeng Song
 

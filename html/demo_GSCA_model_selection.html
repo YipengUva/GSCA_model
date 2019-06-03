@@ -1,0 +1,350 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Demo of the model selection of the GSCA model.</title><meta name="generator" content="MATLAB 8.5"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2018-08-28"><meta name="DC.source" content="demo_GSCA_model_selection.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Demo of the model selection of the GSCA model.</h1><!--introduction--><p>This doc is going to show how to using missing value based cross validation (CV) procedure to perform the model selection of the GSCA model. The GDP penalty is used as an example.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Add current folder to the path</a></li><li><a href="#2">The Simulation of coupled binary and quantitative data sets</a></li><li><a href="#3">Parameters of the GSCA model</a></li><li><a href="#4">The selection of a sequence of lambdas</a></li><li><a href="#5">Model selection based on CV error</a></li><li><a href="#6">Optimal Bayes error</a></li><li><a href="#7">RMSEs in estimating simulated <img src="demo_GSCA_model_selection_eq00082970382179564537.png" alt="$\mathbf{\Theta}$"> during model selection</a></li><li><a href="#8">How <img src="demo_GSCA_model_selection_eq07657233533591063549.png" alt="$\lambda$"> affects the CV error and the RMSE in estimating <img src="demo_GSCA_model_selection_eq00082970382179564537.png" alt="$\mathbf{\Theta}$">?</a></li></ul></div><h2>Add current folder to the path<a name="1"></a></h2><pre class="codeinput">clear <span class="string">all</span>;
+current_fold = pwd;
+addpath(genpath(current_fold));
+</pre><h2>The Simulation of coupled binary and quantitative data sets<a name="2"></a></h2><p>We use the logit transform of the empirical marginal probabilities of the binary CNA data set as the simulated offset term to simulate imbalanced binary data <img src="demo_GSCA_model_selection_eq17959964419684021852.png" alt="$\mathbf{X}_1$">. The number of samples, binary variables and quantitative variables are <img src="demo_GSCA_model_selection_eq07320098067127478556.png" alt="$m=160$">, <img src="demo_GSCA_model_selection_eq01666905598571919641.png" alt="$n_1=410$">, <img src="demo_GSCA_model_selection_eq00345223151753622913.png" alt="$n_2=1000$"> respectively. The noise level <img src="demo_GSCA_model_selection_eq12624043070620070374.png" alt="$\sigma^2$"> in simulating quantitative data set <img src="demo_GSCA_model_selection_eq12169435870262763464.png" alt="$\mathbf{X}_2$"> is 1. The simulated low rank is 10. The SNRs in generating <img src="demo_GSCA_model_selection_eq17959964419684021852.png" alt="$\mathbf{X}_1$"> and <img src="demo_GSCA_model_selection_eq12169435870262763464.png" alt="$\mathbf{X}_2$"> are both 1.</p><pre class="codeinput"><span class="comment">%</span>
+<span class="comment">% import real binary CNA data set</span>
+load(<span class="string">'X1_CNA.mat'</span>);
+mu1_fixed = logit(mean(X1_CNA,1)); <span class="comment">% imbalanced binary data simulation</span>
+<span class="comment">%mu1_fixed = zeros(1,size(X1_CNA,2)); % balanced binary data simulation</span>
+
+<span class="comment">% simulatation</span>
+<span class="comment">% meaning of the parameters can be found in corresponding m file</span>
+SNRs = [1,1];   <span class="comment">% SRNs in simulating X1 and X2</span>
+K    = 10;      <span class="comment">% simulated low rank</span>
+link = <span class="string">'logit'</span>; <span class="comment">% use logit link</span>
+<span class="comment">%link = 'probit'; % use logit link</span>
+seed = 1234;    <span class="comment">% set seed to reproduce the example</span>
+[X1,X2,Theta_simu,mu_simu,Z_simu,E_simu] = GSCA_data_simulation(mu1_fixed,SNRs,K,link,seed);
+
+<span class="comment">% size of simulated data sets</span>
+[m,n1] = size(X1);
+[~,n2] = size(X2);
+
+<span class="comment">% plot of the simulated offset term</span>
+figure
+plot(mu_simu); title(<span class="string">'simulated offset'</span>); xlabel(<span class="string">'variables'</span>);
+
+<span class="comment">% plot of the singular values of true signal and noise</span>
+figure;
+plot(svds(Z_simu,K), <span class="string">'-o'</span>); hold <span class="string">on</span>;
+plot(svds(E_simu,30), <span class="string">'-o'</span>);
+legend(<span class="string">'signal'</span>,<span class="string">'noise'</span>);
+title(<span class="string">'singular values of signal and noise'</span>);
+xlabel(<span class="string">'component'</span>); ylabel(<span class="string">'singular value'</span>);
+</pre><img vspace="5" hspace="5" src="demo_GSCA_model_selection_01.png" alt=""> <img vspace="5" hspace="5" src="demo_GSCA_model_selection_02.png" alt=""> <h2>Parameters of the GSCA model<a name="3"></a></h2><pre class="codeinput"><span class="comment">%</span>
+<span class="comment">% parameters for the GSCA model</span>
+fun = <span class="string">'GDP'</span>; gamma = 1; <span class="comment">% GDP penalty</span>
+
+opts.tol_obj = 1e-5;   <span class="comment">% stopping criteria</span>
+opts.maxit   = 1000;   <span class="comment">% max number of iterations</span>
+opts.link    = link;   <span class="comment">% link function</span>
+opts.gamma   = gamma;  <span class="comment">% tuning parameter</span>
+</pre><h2>The selection of a sequence of lambdas<a name="4"></a></h2><p>We first select a <img src="demo_GSCA_model_selection_eq05536581930466503651.png" alt="$\lambda_{0}$">, which is large enough to achieve a rank 1 or rank 0 estimation. Then we select a <img src="demo_GSCA_model_selection_eq02398621827108921495.png" alt="$\lambda_{t}$">, which is small enough that we can achieve a rank 20 or a higher rank estimation. After that, 20 values of $\lambda$s are selected from the interval <img src="demo_GSCA_model_selection_eq09092142170555736710.png" alt="$[\lambda_{t}, \lambda_{0}]$"> equally in linear space. We evaluate the performance of the GSCA model with the corresponding value of <img src="demo_GSCA_model_selection_eq07657233533591063549.png" alt="$\lambda$"> by the CV error.</p><pre class="codeinput"><span class="comment">%</span>
+<span class="comment">% number of lambdas</span>
+nlambdas = 20;
+
+<span class="comment">% the selection of lambda0, lambdat</span>
+[lambda0]  = GSCA_softThre_MM_modelSelection_lambda0(X1,X2,fun,opts);
+[lambdat]  = GSCA_softThre_MM_modelSelection_lambdat(X1,X2,fun,lambda0,opts);
+lambdat = lambdat*0.9; <span class="comment">% to cover a slightly wider range</span>
+lambdas = linspace(lambdat,lambda0,nlambdas);
+</pre><pre class="codeoutput">
+ warning: non convergence; penalty is not strong enougth;
+ non low rank structure is found 
+
+ warning: non convergence; penalty is not strong enougth;
+ non low rank structure is found 
+
+ warning: non convergence; penalty is not strong enougth;
+ non low rank structure is found 
+
+ warning: non convergence; penalty is not strong enougth;
+ non low rank structure is found 
+
+ warning: non convergence; penalty is not strong enougth;
+ non low rank structure is found 
+
+ warning: non convergence; penalty is not strong enougth;
+ non low rank structure is found 
+
+ warning: non convergence; penalty is not strong enougth;
+ non low rank structure is found 
+
+ warning: non convergence; penalty is not strong enougth;
+ non low rank structure is found 
+
+ warning: non convergence; penalty is not strong enougth;
+ non low rank structure is found 
+</pre><h2>Model selection based on CV error<a name="5"></a></h2><p>Here, we use 7-fold CV procedure. The meaning of the parameters can be found in the corresponding m file.</p><pre class="codeinput"><span class="comment">%</span>
+<span class="comment">% K-fold CV</span>
+Kcv = 7;
+tic;
+[cvErrors_mat,cvSigSqus_mat,cvRanks_mat] = <span class="keyword">...</span>
+    GSCA_softThre_MM_modelSelection(X1,X2,fun,Kcv,lambdas,opts);
+toc;
+
+<span class="comment">% the index of minimum mean CV errors</span>
+[~, min_CV_index] = min(mean(cvErrors_mat,2));
+</pre><pre class="codeoutput">Elapsed time is 504.292845 seconds.
+</pre><h2>Optimal Bayes error<a name="6"></a></h2><p>Bayes error means the scaled negative log-likelihood using the simulated parameters to fit the simulated <img src="demo_GSCA_model_selection_eq17959964419684021852.png" alt="$\mathbf{X}_1$"> and <img src="demo_GSCA_model_selection_eq12169435870262763464.png" alt="$\mathbf{X}_2$">.</p><pre class="codeinput"><span class="comment">%</span>
+<span class="comment">% define the loss function according to the link used</span>
+<span class="keyword">if</span> strcmp(link,<span class="string">'logit'</span>)
+    obj_binary   = str2func(<span class="string">'obj_f_logistic'</span>);
+<span class="keyword">elseif</span> strcmp(link,<span class="string">'probit'</span>)
+    obj_binary   = str2func(<span class="string">'obj_f_probit'</span>);
+<span class="keyword">end</span>
+
+<span class="comment">% Bayes error</span>
+optimal_error = obj_binary(X1,Theta_simu(:,1:n1)) + <span class="keyword">...</span>
+    (1/(2))*norm(X2-Theta_simu(:,(n1+1):end),<span class="string">'fro'</span>)^2 <span class="keyword">...</span>
+    + m*n2*0.5*log(2*pi);
+scaled_optimal_error = optimal_error/(m*n1 + m*n2);
+</pre><h2>RMSEs in estimating simulated <img src="demo_GSCA_model_selection_eq00082970382179564537.png" alt="$\mathbf{\Theta}$"> during model selection<a name="7"></a></h2><p>The RMSE is defined in the paper. The meaning of the parameters in the following section can be found in the corresponding m file.</p><pre class="codeinput"><span class="comment">%</span>
+[RMSE_mat,RV_mat,sigSqus,ranks,RMSE_ind] = <span class="keyword">...</span>
+    GSCA_softThre_MM_modelSelection_RMSEs_simulation(X1,X2,Theta_simu,mu_simu,Z_simu,fun,lambdas,opts);
+</pre><h2>How <img src="demo_GSCA_model_selection_eq07657233533591063549.png" alt="$\lambda$"> affects the CV error and the RMSE in estimating <img src="demo_GSCA_model_selection_eq00082970382179564537.png" alt="$\mathbf{\Theta}$">?<a name="8"></a></h2><pre class="codeinput"><span class="comment">%</span>
+<span class="comment">% log10 transform of the lambdas</span>
+log_lambdas = log10(lambdas);
+
+figure;
+subplot(1,3,1)
+errorbar(log_lambdas, mean(cvErrors_mat,2),std(cvErrors_mat,0,2)); hold <span class="string">on</span>;
+plot(min(log_lambdas):0.01:max(log_lambdas),ones(length(min(log_lambdas):0.01:max(log_lambdas)),1)*scaled_optimal_error,<span class="string">'-r'</span>);hold <span class="string">on</span>;
+plot(log_lambdas(min_CV_index),mean(cvErrors_mat(min_CV_index,:)),<span class="string">'+ r'</span>,<span class="string">'MarkerSize'</span>,10);
+title(<span class="string">'CV error'</span>);
+xlabel(<span class="string">'log_{10}(\lambda)'</span>);
+ylabel(<span class="string">'CV error'</span>);
+legend(<span class="string">'CV error'</span>,<span class="string">'Bayes error'</span>,<span class="string">'mimimum'</span>)
+subplot(1,3,2)
+semilogx(log_lambdas,RMSE_mat(:,1),<span class="string">'-o'</span>); hold <span class="string">on</span>;
+plot(log_lambdas(min_CV_index), RMSE_mat(min_CV_index,1),<span class="string">'+ r'</span>,<span class="string">'MarkerSize'</span>,10);
+title(<span class="string">'RMSE(\Theta)'</span>);
+xlabel(<span class="string">'log_{10}(\lambda)'</span>);
+subplot(1,3,3)
+plot(log_lambdas, mean(cvRanks_mat,2),<span class="string">'-o'</span>); hold <span class="string">on</span>;
+plot(log_lambdas, ranks,<span class="string">'-og'</span>); hold <span class="string">on</span>;
+plot(log_lambdas(min_CV_index), mean(cvRanks_mat(min_CV_index,:)),<span class="string">'+ r'</span>,<span class="string">'MarkerSize'</span>,10);
+title(<span class="string">'estimated ranks'</span>);
+xlabel(<span class="string">'log_{10}(\lambda)'</span>);
+legend(<span class="string">'CV'</span>,<span class="string">'fit'</span>)
+</pre><img vspace="5" hspace="5" src="demo_GSCA_model_selection_03.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Demo of the model selection of the GSCA model. 
+% This doc is going to show how to using missing value based cross validation
+% (CV) procedure to perform the model selection of the GSCA model. The GDP penalty 
+% is used as an example. 
+
+%% Add current folder to the path
+clear all;
+current_fold = pwd;
+addpath(genpath(current_fold));
+
+%% The Simulation of coupled binary and quantitative data sets
+% We use the logit transform of the empirical marginal probabilities of the
+% binary CNA data set as the simulated offset term to simulate imbalanced
+% binary data $\mathbf{X}_1$. The number of samples, binary variables and 
+% quantitative variables are $m=160$, $n_1=410$, $n_2=1000$ respectively. 
+% The noise level $\sigma^2$ in simulating quantitative data set $\mathbf{X}_2$ 
+% is 1. The simulated low rank is 10. The SNRs in generating $\mathbf{X}_1$
+% and $\mathbf{X}_2$ are both 1.
+
+% 
+% import real binary CNA data set
+load('X1_CNA.mat');
+mu1_fixed = logit(mean(X1_CNA,1)); % imbalanced binary data simulation
+%mu1_fixed = zeros(1,size(X1_CNA,2)); % balanced binary data simulation
+
+% simulatation
+% meaning of the parameters can be found in corresponding m file
+SNRs = [1,1];   % SRNs in simulating X1 and X2
+K    = 10;      % simulated low rank
+link = 'logit'; % use logit link
+%link = 'probit'; % use logit link
+seed = 1234;    % set seed to reproduce the example
+[X1,X2,Theta_simu,mu_simu,Z_simu,E_simu] = GSCA_data_simulation(mu1_fixed,SNRs,K,link,seed);
+
+% size of simulated data sets
+[m,n1] = size(X1); 
+[~,n2] = size(X2);
+
+% plot of the simulated offset term
+figure
+plot(mu_simu); title('simulated offset'); xlabel('variables');
+
+% plot of the singular values of true signal and noise
+figure; 
+plot(svds(Z_simu,K), '-o'); hold on;
+plot(svds(E_simu,30), '-o'); 
+legend('signal','noise');
+title('singular values of signal and noise');
+xlabel('component'); ylabel('singular value');
+
+%% Parameters of the GSCA model
+
+%
+% parameters for the GSCA model
+fun = 'GDP'; gamma = 1; % GDP penalty
+
+opts.tol_obj = 1e-5;   % stopping criteria
+opts.maxit   = 1000;   % max number of iterations
+opts.link    = link;   % link function
+opts.gamma   = gamma;  % tuning parameter
+
+%% The selection of a sequence of lambdas
+% We first select a $\lambda_{0}$, which is large enough to achieve a rank
+% 1 or rank 0 estimation. Then we select a $\lambda_{t}$, which is small 
+% enough that we can achieve a rank 20 or a higher rank estimation. After that, 20 values
+% of $\lambda$s are selected from the interval $[\lambda_{t},
+% \lambda_{0}]$ equally in linear space. We evaluate the performance of the GSCA model with
+% the corresponding value of $\lambda$ by the CV error.
+
+%
+% number of lambdas
+nlambdas = 20; 
+
+% the selection of lambda0, lambdat
+[lambda0]  = GSCA_softThre_MM_modelSelection_lambda0(X1,X2,fun,opts);
+[lambdat]  = GSCA_softThre_MM_modelSelection_lambdat(X1,X2,fun,lambda0,opts);
+lambdat = lambdat*0.9; % to cover a slightly wider range
+lambdas = linspace(lambdat,lambda0,nlambdas);
+
+%% Model selection based on CV error
+% Here, we use 7-fold CV procedure. The meaning of the parameters can be found 
+% in the corresponding m file.
+
+%
+% K-fold CV
+Kcv = 7; 
+tic;
+[cvErrors_mat,cvSigSqus_mat,cvRanks_mat] = ...
+    GSCA_softThre_MM_modelSelection(X1,X2,fun,Kcv,lambdas,opts);
+toc;
+
+% the index of minimum mean CV errors
+[~, min_CV_index] = min(mean(cvErrors_mat,2));
+
+%% Optimal Bayes error
+% Bayes error means the scaled negative log-likelihood using the
+% simulated parameters to fit the simulated $\mathbf{X}_1$ and
+% $\mathbf{X}_2$.
+
+% 
+% define the loss function according to the link used
+if strcmp(link,'logit')
+    obj_binary   = str2func('obj_f_logistic');
+elseif strcmp(link,'probit')
+    obj_binary   = str2func('obj_f_probit');
+end
+
+% Bayes error
+optimal_error = obj_binary(X1,Theta_simu(:,1:n1)) + ...
+    (1/(2))*norm(X2-Theta_simu(:,(n1+1):end),'fro')^2 ...
+    + m*n2*0.5*log(2*pi);
+scaled_optimal_error = optimal_error/(m*n1 + m*n2);
+
+%% RMSEs in estimating simulated $\mathbf{\Theta}$ during model selection
+% The RMSE is defined in the paper. The meaning of the parameters 
+% in the following section can be found in the corresponding m file.
+
+%
+[RMSE_mat,RV_mat,sigSqus,ranks,RMSE_ind] = ...
+    GSCA_softThre_MM_modelSelection_RMSEs_simulation(X1,X2,Theta_simu,mu_simu,Z_simu,fun,lambdas,opts);
+
+%% How $\lambda$ affects the CV error and the RMSE in estimating $\mathbf{\Theta}$?
+
+%
+% log10 transform of the lambdas
+log_lambdas = log10(lambdas);
+
+figure;
+subplot(1,3,1)
+errorbar(log_lambdas, mean(cvErrors_mat,2),std(cvErrors_mat,0,2)); hold on; 
+plot(min(log_lambdas):0.01:max(log_lambdas),ones(length(min(log_lambdas):0.01:max(log_lambdas)),1)*scaled_optimal_error,'-r');hold on;
+plot(log_lambdas(min_CV_index),mean(cvErrors_mat(min_CV_index,:)),'+ r','MarkerSize',10);
+title('CV error');
+xlabel('log_{10}(\lambda)'); 
+ylabel('CV error');
+legend('CV error','Bayes error','mimimum')
+subplot(1,3,2)
+semilogx(log_lambdas,RMSE_mat(:,1),'-o'); hold on; 
+plot(log_lambdas(min_CV_index), RMSE_mat(min_CV_index,1),'+ r','MarkerSize',10);
+title('RMSE(\Theta)');
+xlabel('log_{10}(\lambda)'); 
+subplot(1,3,3)
+plot(log_lambdas, mean(cvRanks_mat,2),'-o'); hold on; 
+plot(log_lambdas, ranks,'-og'); hold on; 
+plot(log_lambdas(min_CV_index), mean(cvRanks_mat(min_CV_index,:)),'+ r','MarkerSize',10);
+title('estimated ranks');
+xlabel('log_{10}(\lambda)'); 
+legend('CV','fit')
+
+##### SOURCE END #####
+--></body></html>
